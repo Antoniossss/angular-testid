@@ -25,21 +25,26 @@ export class AngularTestidDirective extends NgDestroy {
   ) {
     super();
     this.renderer = new BoundRenderer(this.host, r);
+    this.removeDefaultTag();
     combineLatest([this.service.isEnabled, this.$contentSubject])
       .pipe(takeUntil(this.onDestroy))
-      .subscribe(r => this.update(r[0], r[1]));
+      .subscribe(v => this.update(v[0], v[1]));
   }
 
   private update(flag: boolean, content: string) {
     const tag = this.options.tag;
+    if (tag !== DEFAULT_TAG) {
+      this.renderer.removeAttribute(DEFAULT_TAG);
+    }
     if (flag && content !== '') {
       this.renderer.setAttribute(tag, content);
       return;
     }
     this.renderer.removeAttribute(tag);
-    if (tag != DEFAULT_TAG) {
-      this.renderer.removeAttribute(DEFAULT_TAG);
-    }
+  }
+
+  private removeDefaultTag() {
+    this.renderer.removeAttribute(DEFAULT_TAG);
   }
 }
 
